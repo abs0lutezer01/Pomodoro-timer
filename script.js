@@ -68,7 +68,7 @@ function setCustomTime() {
 
 // --- LOCAL MUSIC PLAYER ---
 // Update these names if your files are different!
-const tracks = ['track1.mp3', 'track2.mp3', 'track3.mp3']; 
+const tracks = ['track1.m4a', 'track2.m4a', 'track3.m4a']; 
 let currentTrackIndex = 0;
 let isPlaying = false;
 let audio = new Audio(tracks[currentTrackIndex]);
@@ -110,3 +110,4 @@ function prevTrack() {
 
 // Ensure the first track has the "onended" listener
 audio.onended = () => nextTrack();
+
