@@ -1,140 +1,102 @@
-// --- BACKGROUNDS (Matches your filenames exactly) ---
+// 1. Background Logic
 const images = [
-    'Green water.jpg',
-    'Grey Mountains.jpg',
-    'The street.jpg'
+    "Green water.jpg",
+    "Grey Mountains.jpg",
+    "The street.jpg"
 ];
-let currentImageIndex = 0;
+let currentImg = 0;
 
 function changeBackground() {
-    // We add a dark overlay so the white text is always readable
-    document.body.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('${images[currentImageIndex]}')`;
-    currentImageIndex = (currentImageIndex + 1) % images.length;
+    const url = images[currentImg];
+    document.body.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('${url}')`;
+    currentImg = (currentImg + 1) % images.length;
 }
-// Run once on load
 changeBackground();
 
-// --- TIMER & TRACKING ---
-let startingTime = 25 * 60;
-let timeLeft = startingTime;
-let timerInterval = null;
-let isBreakMode = false;
-let focusSeconds = 0;
-let breakSeconds = 0;
-
-const display = document.getElementById('timer-display');
-const focusDisplay = document.getElementById('focus-total');
-const breakDisplay = document.getElementById('break-total');
-
-function formatStatsTime(totalSeconds) {
-    const mins = Math.floor(totalSeconds / 60);
-    const secs = totalSeconds % 60;
-    return `${mins}m ${secs}s`;
-}
+// 2. Timer & Stats Logic
+let timeLeft = 25 * 60;
+let timerVar = null;
+let isBreak = false;
+let focusSecs = 0;
+let breakSecs = 0;
 
 function updateDisplay() {
-    const minutes = Math.floor(timeLeft / 60);
-    const seconds = timeLeft % 60;
-    display.innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    const m = Math.floor(timeLeft / 60);
+    const s = timeLeft % 60;
+    document.getElementById('timer-display').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
 }
 
 function startTimer() {
-    if (timerInterval) return;
-    timerInterval = setInterval(() => {
+    if (timerVar) return;
+    timerVar = setInterval(() => {
         if (timeLeft > 0) {
             timeLeft--;
             updateDisplay();
-            if (!isBreakMode) {
-                focusSeconds++;
-                focusDisplay.innerText = formatStatsTime(focusSeconds);
+            if (!isBreak) {
+                focusSecs++;
+                document.getElementById('focus-total').innerText = `${Math.floor(focusSecs/60)}m ${focusSecs%60}s`;
             } else {
-                breakSeconds++;
-                breakDisplay.innerText = formatStatsTime(breakSeconds);
+                breakSecs++;
+                document.getElementById('break-total').innerText = `${Math.floor(breakSecs/60)}m ${breakSecs%60}s`;
             }
         } else {
-            clearInterval(timerInterval);
-            timerInterval = null;
-            alert(isBreakMode ? "Break Over!" : "Focus Over!");
+            pauseTimer();
+            alert("Time is up!");
         }
     }, 1000);
 }
 
-function pauseTimer() {
-    clearInterval(timerInterval);
-    timerInterval = null;
-}
+function pauseTimer() { clearInterval(timerVar); timerVar = null; }
 
-function resetTimer() {
-    pauseTimer();
-    timeLeft = startingTime;
-    updateDisplay();
+function resetTimer() { 
+    pauseTimer(); 
+    timeLeft = 25 * 60; 
+    isBreak = false;
+    updateDisplay(); 
 }
 
 function startBreak(mins) {
     pauseTimer();
-    isBreakMode = true;
-    startingTime = mins * 60;
-    timeLeft = startingTime;
+    isBreak = true;
+    timeLeft = mins * 60;
     updateDisplay();
     startTimer();
 }
 
-function setCustomTime() {
-    const input = document.getElementById('user-minutes');
-    if (input.value > 0) {
-        pauseTimer();
-        isBreakMode = false;
-        startingTime = input.value * 60;
-        timeLeft = startingTime;
-        updateDisplay();
-        input.value = '';
-    }
-}
-
 function resetStats() {
-    focusSeconds = 0;
-    breakSeconds = 0;
-    focusDisplay.innerText = "0m 0s";
-    breakDisplay.innerText = "0m 0s";
+    focusSecs = 0; breakSecs = 0;
+    document.getElementById('focus-total').innerText = "0m 0s";
+    document.getElementById('break-total').innerText = "0m 0s";
 }
 
-// --- MUSIC PLAYER (Matches your .mp3 filenames) ---
-const tracks = ['Alpha waves 1.mp3', 'White Noise 1.mp3'];
-let currentTrackIndex = 0;
-let isPlaying = false;
-let isRepeating = false;
-let audio = new Audio(tracks[currentTrackIndex]);
-
-const playBtn = document.getElementById('play-pause-btn');
-const repeatBtn = document.getElementById('repeat-btn');
-const trackLabel = document.getElementById('track-label');
+// 3. Music Logic (Using your exact filenames)
+const tracks = ["Alpha waves 1.mp3", "White Noise 1.mp3"];
+let currentTrack = 0;
+let playing = false;
+let loop = false;
+let audio = new Audio(tracks[currentTrack]);
 
 function toggleMusic() {
-    if (isPlaying) {
-        audio.pause();
-        playBtn.innerText = '▶';
-    } else {
-        audio.play().catch(e => console.log("Blocked: Click the page first."));
-        playBtn.innerText = '⏸';
-    }
-    isPlaying = !isPlaying;
+    if (playing) { audio.pause(); document.getElementById('play-pause-btn').innerText = '▶'; }
+    else { audio.play().catch(() => {}); document.getElementById('play-pause-btn').innerText = '⏸'; }
+    playing = !playing;
 }
 
 function toggleRepeat() {
-    isRepeating = !isRepeating;
-    repeatBtn.style.opacity = isRepeating ? "1" : "0.5";
+    loop = !loop;
+    document.getElementById('repeat-btn').style.opacity = loop ? "1" : "0.5";
 }
 
-function loadTrack(index) {
+function loadTrack(idx) {
     audio.pause();
-    currentTrackIndex = index;
-    audio = new Audio(tracks[currentTrackIndex]);
-    trackLabel.innerText = tracks[currentTrackIndex].replace('.mp3', '').toUpperCase();
-    audio.onended = () => { if (isRepeating) { audio.currentTime = 0; audio.play(); } else { nextTrack(); } };
-    if (isPlaying) audio.play();
+    currentTrack = idx;
+    audio = new Audio(tracks[currentTrack]);
+    document.getElementById('track-label').innerText = tracks[currentTrack].toUpperCase();
+    audio.onended = () => { if(loop) { audio.currentTime = 0; audio.play(); } else { nextTrack(); } };
+    if (playing) audio.play();
 }
 
-function nextTrack() { loadTrack((currentTrackIndex + 1) % tracks.length); }
-function prevTrack() { loadTrack((currentTrackIndex - 1 + tracks.length) % tracks.length); }
+function nextTrack() { loadTrack((currentTrack + 1) % tracks.length); }
+function prevTrack() { loadTrack((currentTrack - 1 + tracks.length) % tracks.length); }
 
-audio.onended = () => { if (isRepeating) { audio.currentTime = 0; audio.play(); } else { nextTrack(); } };
+audio.onended = () => { if(loop) { audio.currentTime = 0; audio.play(); } else { nextTrack(); } };
