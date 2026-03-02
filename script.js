@@ -1,5 +1,8 @@
 // --- BACKGROUNDS ---
 const images = [
+     'Green water.jpg',
+     'Grey Mountains.jpg',
+    'The street.jpg',
     'https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=2070',
     'https://images.unsplash.com/photo-1516331138075-f3ad1576e0c1?q=80&w=2000',
     'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2000',
@@ -68,7 +71,7 @@ function setCustomTime() {
 
 // --- LOCAL MUSIC PLAYER ---
 // Update these names if your files are different!
-const tracks = ['track1.m4a', 'track2.m4a', 'track3.m4a']; 
+const tracks = ['LXbJOhbt954Nc2UxhHsw+_WcAnBE1NjU.m4a']; 
 let currentTrackIndex = 0;
 let isPlaying = false;
 let audio = new Audio(tracks[currentTrackIndex]);
@@ -110,4 +113,5 @@ function prevTrack() {
 
 // Ensure the first track has the "onended" listener
 audio.onended = () => nextTrack();
+
 
