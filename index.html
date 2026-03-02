@@ -6,9 +6,8 @@
     <title>My Cozy Pomodoro</title>
     <style>
         * { box-sizing: border-box; }
-
         body {
-            font-family: 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -16,139 +15,95 @@
             height: 100vh;
             margin: 0;
             overflow: hidden;
-            transition: background-image 0.8s ease-in-out;
+            transition: background-image 0.8s ease;
             background-size: cover;
             background-position: center;
+            background-color: #222;
             color: white;
             text-align: center;
         }
 
-        /* --- STATS ISLAND --- */
+        /* Stats Island */
         .stats-island {
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(10px);
             padding: 15px 25px;
             border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
-            gap: 30px;
+            gap: 25px;
             margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
+        .stat-value { font-size: 1.2rem; font-weight: bold; display: block; }
+        .stat-label { font-size: 0.7rem; opacity: 0.7; letter-spacing: 1px; }
 
-        .stat-box { text-align: left; }
-        .stat-label { font-size: 0.65rem; opacity: 0.7; letter-spacing: 2px; margin-bottom: 4px; }
-        .stat-value { font-size: 1.4rem; font-weight: bold; font-variant-numeric: tabular-nums; }
-
-        #reset-stats-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            color: white;
-            padding: 8px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: 0.3s;
-            line-height: 1;
-        }
-        #reset-stats-btn:hover { background: rgba(255, 240, 240, 0.3); transform: rotate(90deg); }
-
-        /* --- TIMER DISPLAY --- */
         #timer-display {
-            font-size: 14rem; 
+            font-size: 12rem;
             font-weight: 900;
             margin: 0;
-            line-height: 0.9;
-            letter-spacing: -8px;
+            line-height: 0.8;
         }
 
-        /* --- CONTROL BUTTONS --- */
-        .controls {
-            display: flex;
-            gap: 12px;
-            margin-top: 30px;
-        }
-
-        .glass-island {
+        .controls { display: flex; gap: 15px; margin-top: 30px; }
+        .glass-btn {
             background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
+            backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 15px 30px;
-            font-size: 0.9rem;
-            font-weight: bold;
+            padding: 15px 25px;
             color: white;
-            border-radius: 15px;
+            border-radius: 12px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            font-weight: bold;
             text-transform: uppercase;
         }
 
-        .glass-island:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .break-btn { background: rgba(100, 255, 100, 0.15); }
-
-        .settings {
-            margin-top: 40px;
-            display: flex;
-            gap: 10px;
-        }
-
-        .glass-input {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 12px;
-            border-radius: 12px;
-            color: white;
-            width: 90px;
-            text-align: center;
-            outline: none;
-        }
-
-        /* --- MUSIC ISLAND --- */
+        /* Music Island */
         .music-island {
             position: fixed;
-            bottom: 25px;
-            right: 25px;
-            width: 240px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 20px;
-            border-radius: 25px;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(15px);
+            padding: 15px;
+            border-radius: 20px;
+            width: 220px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
+        .music-btn { background: none; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
 
-        .music-controls { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 10px; }
-        .music-btn { background: rgba(255, 255, 255, 0.15); border: none; color: white; padding: 10px; border-radius: 12px; cursor: pointer; }
-
-        #bg-switcher {
-            position: fixed;
-            bottom: 25px;
-            left: 25px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 12px 25px;
-            border-radius: 50px;
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-            font-weight: bold;
-        }
-
-        @media (max-width: 768px) {
-            #timer-display { font-size: 7rem; letter-spacing: -2px; }
-            .music-island, .stats-island { display: none; }
-        }
+        #bg-switcher { position: fixed; bottom: 20px; left: 20px; }
     </style>
 </head>
 <body>
 
     <div class="stats-island">
-        <div class="stat-box">
-            <div class="stat-label">FOCUS TIME</div>
-            <div id="focus-total" class="stat-value">0m 0s</div>
+        <div><span class="stat-label">FOCUS</span><span id="focus-total" class="stat-value">0m 0s</span></div>
+        <div><span class="stat-label">BREAK</span><span id="break-total" class="stat-value">0m 0s</span></div>
+        <button onclick="resetStats()" style="background:none; border:none; color:white; cursor:pointer;">🔄</button>
+    </div>
+
+    <h1 id="timer-display">25:00</h1>
+
+    <div class="controls">
+        <button class="glass-btn" onclick="startTimer()">Start</button>
+        <button class="glass-btn" onclick="pauseTimer()">Pause</button>
+        <button class="glass-btn" onclick="startBreak(5)" style="color: #afffaf;">Break</button>
+        <button class="glass-btn" onclick="resetTimer()">Reset</button>
+    </div>
+
+    <button id="bg-switcher" class="glass-btn" onclick="changeBackground()">🖼️ Switch Scene</button>
+
+    <div class="music-island">
+        <div id="track-label" style="font-size: 0.7rem; margin-bottom: 8px;">TRACK</div>
+        <div style="display: flex; gap: 8px; justify-content: center;">
+            <button class="music-btn" onclick="prevTrack()">⏮</button>
+            <button class="music-btn" id="play-pause-btn" onclick="toggleMusic()">▶</button>
+            <button class="music-btn" onclick="nextTrack()">⏭</button>
+            <button class="music-btn" id="repeat-btn" onclick="toggleRepeat()" style="opacity:0.5">🔁</button>
         </div>
-        <div class="stat-box">
-            <div class="stat-label">BREAK TIME</div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
