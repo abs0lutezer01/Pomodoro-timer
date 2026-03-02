@@ -43,6 +43,16 @@
             color: white;
             text-align: center;
         }
+        .mode-switch {
+            margin-bottom: 10px;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            opacity: 0.6;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .mode-switch:hover { opacity: 1; }
+        .active-mode { font-weight: bold; color: #afffaf; opacity: 1; }
 
         /* Stats Island */
         .stats-island {
@@ -175,7 +185,14 @@
             <button style="background:none; border:1px solid rgba(255,255,255,0.2); color:white; cursor:pointer;" onclick="nextTrack()">⏭</button>
         </div>
     </div>
+     <div class="mode-switch" onclick="toggleTimerMode()">
+        <span id="pomo-label" class="active-mode">POMODORO</span> | 
+        <span id="stopwatch-label">STOPWATCH</span>
+    </div>
+
+    <h1 id="timer-display">25:00</h1>
 
     <script src="script.js"></script>
 </body>
 </html>
+
