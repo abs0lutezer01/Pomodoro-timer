@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+        <meta charset="UTF-8">
     <title>Cozy Pomodoro | Aesthetic Timer & To-Do List</title>
     <link rel="icon" href="https://fav.farm/⚪">
 <meta name="title" content="Cozy Pomodoro | Aesthetic Timer & To-Do List">
@@ -24,7 +24,7 @@
 <meta property="twitter:image" content="Green water.jpg">
     <meta name="google-site-verification" content="X0jDkOLlZfhkYQHPPcTD-as4DgMip59ykwxtzymYfMg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Cozy Pomodoro</title>
+    
     <style>
         * { box-sizing: border-box; }
         body {
@@ -44,7 +44,7 @@
             text-align: center;
         }
 
-        /* --- STATS & TIMER --- */
+        /* Stats Island */
         .stats-island {
             background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(10px);
@@ -61,10 +61,9 @@
 
         #timer-display { font-size: 12rem; font-weight: 900; margin: 0; line-height: 0.8; letter-spacing: -5px; }
 
-        /* --- TO-DO LIST PANEL --- */
-        .todo-island {
+        /* Panels (To-Do & Settings) */
+        .side-panel {
             position: fixed;
-            left: -320px; /* Hidden by default */
             top: 20px;
             bottom: 80px;
             width: 300px;
@@ -73,15 +72,19 @@
             border-radius: 25px;
             border: 1px solid rgba(255,255,255,0.1);
             padding: 25px;
-            transition: left 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            text-align: left;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             z-index: 100;
         }
-        .todo-island.active { left: 20px; }
+        #todo-panel { left: -320px; text-align: left; }
+        #todo-panel.active { left: 20px; }
         
-        .todo-header { font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; display: flex; justify-content: space-between; }
+        #settings-panel { right: -320px; text-align: center; }
+        #settings-panel.active { right: 20px; }
+
+        .panel-header { font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; display: flex; justify-content: space-between; }
         
-        #todo-input {
+        /* Inputs */
+        input {
             width: 100%;
             background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.2);
@@ -89,8 +92,9 @@
             border-radius: 10px;
             color: white;
             margin-bottom: 15px;
+            outline: none;
         }
-        
+
         .todo-list { list-style: none; padding: 0; max-height: 350px; overflow-y: auto; }
         .todo-item {
             background: rgba(255,255,255,0.05);
@@ -100,11 +104,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.9rem;
         }
-        .todo-item button { background: none; border: none; color: #ff6b6b; cursor: pointer; font-weight: bold; }
 
-        /* --- BUTTONS & CONTROLS --- */
+        /* Buttons */
         .controls { display: flex; gap: 15px; margin-top: 30px; }
         .glass-btn {
             background: rgba(255, 255, 255, 0.1);
@@ -116,22 +118,32 @@
             cursor: pointer;
             font-weight: bold;
             text-transform: uppercase;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            transition: 0.3s;
         }
+        .glass-btn:hover { background: rgba(255,255,255,0.2); }
 
         .music-island { position: fixed; bottom: 20px; right: 20px; background: rgba(0,0,0,0.4); backdrop-filter: blur(15px); padding: 15px; border-radius: 20px; width: 220px; border: 1px solid rgba(255,255,255,0.1); }
-        .music-btn { background: none; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
         
-        #todo-toggle { position: fixed; bottom: 20px; left: 160px; z-index: 101; }
-        #bg-switcher { position: fixed; bottom: 20px; left: 20px; }
+        /* Bottom Row Buttons */
+        .bottom-nav { position: fixed; bottom: 20px; left: 20px; display: flex; gap: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="todo-island" id="todo-panel">
-        <div class="todo-header">Tasks <span>📝</span></div>
-        <input type="text" id="todo-input" placeholder="What needs doing?" onkeypress="if(event.key==='Enter') addTask()">
+    <div class="side-panel" id="todo-panel">
+        <div class="panel-header">Tasks <span>📝</span></div>
+        <input type="text" id="todo-input" placeholder="Add a task..." onkeypress="if(event.key==='Enter') addTask()">
         <ul class="todo-list" id="todo-list"></ul>
+    </div>
+
+    <div class="side-panel" id="settings-panel">
+        <div class="panel-header">Settings <span>⚙️</span></div>
+        <label style="font-size: 0.7rem; opacity: 0.8;">FOCUS MINUTES</label>
+        <input type="number" id="focus-input" value="25">
+        <label style="font-size: 0.7rem; opacity: 0.8;">BREAK MINUTES</label>
+        <input type="number" id="break-input" value="5">
+        <button class="glass-btn" style="width: 100%;" onclick="applySettings()">Apply Time</button>
     </div>
 
     <div class="stats-island">
@@ -149,22 +161,21 @@
         <button class="glass-btn" onclick="resetTimer()">Reset</button>
     </div>
 
-    <button id="bg-switcher" class="glass-btn" onclick="changeBackground()">🖼️ Scene</button>
-    <button id="todo-toggle" class="glass-btn" onclick="toggleTodo()">📝 Tasks</button>
+    <div class="bottom-nav">
+        <button class="glass-btn" onclick="changeBackground()">🖼️ Scene</button>
+        <button class="glass-btn" onclick="togglePanel('todo-panel')">📝 Tasks</button>
+        <button class="glass-btn" onclick="togglePanel('settings-panel')">⚙️ Time</button>
+    </div>
 
     <div class="music-island">
         <div id="track-label" style="font-size: 0.7rem; margin-bottom: 8px; font-weight: bold;">ALPHA WAVES 1</div>
         <div style="display: flex; gap: 8px; justify-content: center;">
-            <button class="music-btn" onclick="prevTrack()">⏮</button>
-            <button class="music-btn" id="play-pause-btn" onclick="toggleMusic()">▶</button>
-            <button class="music-btn" onclick="nextTrack()">⏭</button>
-            <button class="music-btn" id="repeat-btn" onclick="toggleRepeat()" style="opacity:0.5">🔁</button>
+            <button style="background:none; border:1px solid rgba(255,255,255,0.2); color:white; cursor:pointer;" onclick="prevTrack()">⏮</button>
+            <button style="background:none; border:1px solid rgba(255,255,255,0.2); color:white; cursor:pointer;" id="play-pause-btn" onclick="toggleMusic()">▶</button>
+            <button style="background:none; border:1px solid rgba(255,255,255,0.2); color:white; cursor:pointer;" onclick="nextTrack()">⏭</button>
         </div>
     </div>
 
     <script src="script.js"></script>
 </body>
 </html>
-
-
-
