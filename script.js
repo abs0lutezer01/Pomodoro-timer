@@ -16,14 +16,25 @@ function changeBackground() {
 }
 changeBackground();
 
-// --- POMODORO TIMER ---
+// --- TRACKING & TIMER LOGIC ---
 let startingTime = 25 * 60; 
 let timeLeft = startingTime; 
 let timerInterval = null;
-let sessionsCompleted = 0;
+let isBreakMode = false;
+
+// Statistics
+let focusSeconds = 0;
+let breakSeconds = 0;
 
 const display = document.getElementById('timer-display');
-const sessionDisplay = document.getElementById('session-count');
+const focusDisplay = document.getElementById('focus-total');
+const breakDisplay = document.getElementById('break-total');
+
+function formatStatsTime(totalSeconds) {
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+    return `${mins}m ${secs}s`;
+}
 
 function updateDisplay() {
     const minutes = Math.floor(timeLeft / 60);
@@ -37,12 +48,19 @@ function startTimer() {
         if (timeLeft > 0) {
             timeLeft--;
             updateDisplay();
+            
+            // Increment the correct tracker
+            if (!isBreakMode) {
+                focusSeconds++;
+                focusDisplay.innerText = formatStatsTime(focusSeconds);
+            } else {
+                breakSeconds++;
+                breakDisplay.innerText = formatStatsTime(breakSeconds);
+            }
         } else {
             clearInterval(timerInterval);
             timerInterval = null;
-            sessionsCompleted++;
-            sessionDisplay.innerText = sessionsCompleted;
-            alert("Focus session complete!");
+            alert(isBreakMode ? "Break is over!" : "Focus session finished!");
         }
     }, 1000);
 }
@@ -58,14 +76,33 @@ function resetTimer() {
     updateDisplay();
 }
 
+function startBreak(mins) {
+    pauseTimer();
+    isBreakMode = true;
+    startingTime = mins * 60;
+    timeLeft = startingTime;
+    updateDisplay();
+    startTimer();
+}
+
 function setCustomTime() {
     const input = document.getElementById('user-minutes');
     if (input.value > 0) {
         pauseTimer();
+        isBreakMode = false; // Custom time assumes a new focus session
         startingTime = input.value * 60;
         timeLeft = startingTime;
         updateDisplay();
         input.value = '';
+    }
+}
+
+function resetStats() {
+    if(confirm("Reset focus and break timers to zero?")) {
+        focusSeconds = 0;
+        breakSeconds = 0;
+        focusDisplay.innerText = "0m 0s";
+        breakDisplay.innerText = "0m 0s";
     }
 }
 
@@ -89,7 +126,7 @@ function toggleMusic() {
         audio.pause();
         playBtn.innerText = '▶';
     } else {
-        audio.play().catch(e => console.log("Interaction needed for play"));
+        audio.play().catch(e => console.log("Click required"));
         playBtn.innerText = '⏸';
     }
     isPlaying = !isPlaying;
@@ -115,21 +152,11 @@ function loadTrack(index) {
     currentTrackIndex = index;
     audio = new Audio(tracks[currentTrackIndex]);
     trackLabel.innerText = formatTrackName(tracks[currentTrackIndex]);
-    
     audio.onended = () => handleTrackEnd();
-    
-    if (isPlaying) {
-        audio.play().catch(e => console.log("Playback error"));
-    }
+    if (isPlaying) audio.play();
 }
 
-function nextTrack() {
-    loadTrack((currentTrackIndex + 1) % tracks.length);
-}
+function nextTrack() { loadTrack((currentTrackIndex + 1) % tracks.length); }
+function prevTrack() { loadTrack((currentTrackIndex - 1 + tracks.length) % tracks.length); }
 
-function prevTrack() {
-    loadTrack((currentTrackIndex - 1 + tracks.length) % tracks.length);
-}
-
-// Initial Listener
 audio.onended = () => handleTrackEnd();
