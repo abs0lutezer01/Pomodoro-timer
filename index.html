@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-     <meta charset="UTF-8">
+    <meta charset="UTF-8">
     <title>Cozy Pomodoro | Aesthetic Timer & To-Do List</title>
     <link rel="icon" href="https://fav.farm/⚪">
 <meta name="title" content="Cozy Pomodoro | Aesthetic Timer & To-Do List">
@@ -24,6 +24,7 @@
 <meta property="twitter:image" content="Green water.jpg">
     <meta name="google-site-verification" content="X0jDkOLlZfhkYQHPPcTD-as4DgMip59ykwxtzymYfMg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cozy Pomodoro | Aesthetic Timer</title>
     <style>
         * { box-sizing: border-box; }
         body {
@@ -159,14 +160,22 @@
         <ul class="todo-list" id="todo-list"></ul>
     </div>
 
-    <div class="side-panel" id="settings-panel">
-        <div class="panel-header">Settings ⚙️</div>
-        <label style="font-size: 0.7rem; opacity: 0.8;">FOCUS MINUTES</label>
-        <input type="number" id="focus-input" value="25">
-        <label style="font-size: 0.7rem; opacity: 0.8;">BREAK MINUTES</label>
-        <input type="number" id="break-input" value="5">
-        <button class="glass-btn" style="width: 100%;" onclick="applySettings()">Apply Time</button>
+   <div class="side-panel" id="settings-panel">
+    <div class="panel-header">Settings ⚙️</div>
+    
+    <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px;">
+        <span style="font-size: 0.8rem;">ALARM SOUND</span>
+        <button id="mute-btn" class="glass-btn" style="padding: 5px 10px; font-size: 0.6rem;" onclick="toggleMute()">ON 🔊</button>
     </div>
+
+    <label style="font-size: 0.7rem; opacity: 0.8;">FOCUS MINUTES</label>
+    <input type="number" id="focus-input" value="25">
+    
+    <label style="font-size: 0.7rem; opacity: 0.8;">BREAK MINUTES</label>
+    <input type="number" id="break-input" value="5">
+    
+    <button class="glass-btn" style="width: 100%;" onclick="applySettings()">Apply Time</button>
+</div>
 
     <div class="stats-island">
         <div><span class="stat-label">FOCUS</span><span id="focus-total" class="stat-value">0m 0s</span></div>
