@@ -25,193 +25,242 @@
     <meta name="google-site-verification" content="X0jDkOLlZfhkYQHPPcTD-as4DgMip59ykwxtzymYfMg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cozy Pomodoro | Aesthetic Timer</title>
-    <style>
-        * { box-sizing: border-box; }
+  <style>
+        :root {
+            --glass: rgba(0, 0, 0, 0.3);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent: #afffaf;
+        }
+
         body {
-            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
-            transition: background-image 0.8s ease;
-            background-size: cover;
-            background-position: center;
-            background-color: #222;
+            justify-content: center;
+            font-family: 'Segoe UI', sans-serif;
             color: white;
-            text-align: center;
+            background: #1a1a1a url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1920&q=80') no-repeat center center/cover;
+            transition: background 1s ease;
         }
 
         /* Stats Island */
         .stats-island {
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
-            padding: 15px 25px;
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            padding: 15px 30px;
             border-radius: 20px;
             display: flex;
-            align-items: center;
-            gap: 25px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255,255,255,0.1);
+            gap: 40px;
+            border: 1px solid var(--glass-border);
+            margin-bottom: 40px;
+            text-align: center;
         }
-        .stat-value { font-size: 1.2rem; font-weight: bold; display: block; }
-        .stat-label { font-size: 0.7rem; opacity: 0.7; letter-spacing: 1px; }
 
-        /* Mode Switcher */
-        .mode-switch {
-    margin-bottom: 15px;
-    font-size: 0.8rem;
-    letter-spacing: 2px;
-    opacity: 0.6;
-    cursor: pointer;
-    transition: 0.3s;
-    /* FIX THE GLITCH: */
-    display: inline-block; 
-    user-select: none; /* Prevents text from being highlighted while clicking */
-    padding: 10px;    /* Gives your mouse a bigger area to click */
-}
+        .stat-label { font-size: 0.7rem; opacity: 0.7; letter-spacing: 1px; margin-bottom: 5px; }
+        .stat-value { font-size: 1.2rem; font-weight: bold; }
 
-.mode-switch:hover { 
-    opacity: 1; 
-    transform: scale(1.05); /* Smoothly grows instead of glitching */
-}
+        /* Timer display */
+        .timer-display {
+            font-size: 12rem;
+            font-weight: bold;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin: 10px 0;
+        }
 
-.active-mode { 
-    font-weight: bold; 
-    color: #afffaf; 
-    opacity: 1; 
-    text-shadow: 0 0 10px rgba(175, 255, 175, 0.5); /* Glow effect */
-}
-        .mode-switch:hover { opacity: 1; }
-        .active-mode { font-weight: bold; color: #afffaf; opacity: 1; }
+        .controls { display: flex; gap: 15px; }
 
-        #timer-display { font-size: 12rem; font-weight: 900; margin: 0; line-height: 0.8; letter-spacing: -5px; }
+        .btn {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 12px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: 0.3s;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
 
+        .btn:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
+        
         /* Side Panels */
         .side-panel {
             position: fixed;
-            top: 20px;
-            bottom: 80px;
+            top: 0;
+            right: -350px;
             width: 300px;
-            background: rgba(0, 0, 0, 0.7);
+            height: 100%;
+            background: rgba(0,0,0,0.85);
             backdrop-filter: blur(20px);
-            border-radius: 25px;
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 25px;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            padding: 40px;
+            transition: 0.4s ease-in-out;
             z-index: 100;
         }
-        #todo-panel { left: -320px; text-align: left; }
-        #todo-panel.active { left: 20px; }
-        
-        #settings-panel { right: -320px; text-align: center; }
-        #settings-panel.active { right: 20px; }
+        .side-panel.active { right: 0; }
 
-        .panel-header { font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; display: flex; justify-content: space-between; }
-        
         input {
             width: 100%;
             background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            padding: 10px;
-            border-radius: 10px;
+            border: 1px solid var(--glass-border);
             color: white;
-            margin-bottom: 15px;
-            outline: none;
-        }
-
-        .todo-list { list-style: none; padding: 0; max-height: 350px; overflow-y: auto; }
-        .todo-item {
-            background: rgba(255,255,255,0.05);
             padding: 10px;
-            border-radius: 10px;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            margin: 10px 0 20px;
+            border-radius: 8px;
         }
 
-        /* Buttons */
-        .controls { display: flex; gap: 15px; margin-top: 30px; }
-        .glass-btn {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 12px 20px;
-            color: white;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: bold;
-            text-transform: uppercase;
-            font-size: 0.75rem;
-        }
-
-        .bottom-nav { position: fixed; bottom: 20px; left: 20px; display: flex; gap: 10px; }
-        .music-island { position: fixed; bottom: 20px; right: 20px; background: rgba(0,0,0,0.4); backdrop-filter: blur(15px); padding: 15px; border-radius: 20px; width: 220px; border: 1px solid rgba(255,255,255,0.1); }
+        .toggle-settings { position: fixed; bottom: 20px; right: 20px; cursor: pointer; opacity: 0.6; }
     </style>
 </head>
 <body>
 
-    <div class="side-panel" id="todo-panel">
-        <div class="panel-header">Tasks 📝</div>
-        <input type="text" id="todo-input" placeholder="Add a task..." onkeypress="if(event.key==='Enter') addTask()">
-        <ul class="todo-list" id="todo-list"></ul>
-    </div>
-
-   <div class="side-panel" id="settings-panel">
-    <div class="panel-header">Settings ⚙️</div>
-    
-    <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px;">
-        <span style="font-size: 0.8rem;">ALARM SOUND</span>
-        <button id="mute-btn" class="glass-btn" style="padding: 5px 10px; font-size: 0.6rem;" onclick="toggleMute()">ON 🔊</button>
-    </div>
-
-    <label style="font-size: 0.7rem; opacity: 0.8;">FOCUS MINUTES</label>
-    <input type="number" id="focus-input" value="25">
-    
-    <label style="font-size: 0.7rem; opacity: 0.8;">BREAK MINUTES</label>
-    <input type="number" id="break-input" value="5">
-    
-    <button class="glass-btn" style="width: 100%;" onclick="applySettings()">Apply Time</button>
-</div>
-
     <div class="stats-island">
-        <div><span class="stat-label">FOCUS</span><span id="focus-total" class="stat-value">0m 0s</span></div>
-        <div><span class="stat-label">BREAK</span><span id="break-total" class="stat-value">0m 0s</span></div>
-        <button onclick="resetStats()" style="background:none; border:none; color:white; cursor:pointer;">🔄</button>
-    </div>
-
-    <div class="mode-switch" onclick="toggleTimerMode()">
-        <span id="pomo-label" class="active-mode">POMODORO</span> | 
-        <span id="stopwatch-label">STOPWATCH</span>
-    </div>
-
-    <h1 id="timer-display">25:00</h1>
-
-    <div class="controls">
-        <button class="glass-btn" onclick="startTimer()">Start</button>
-        <button class="glass-btn" onclick="pauseTimer()">Pause</button>
-        <button class="glass-btn" onclick="runBreak()" id="break-btn" style="color: #afffaf;">Break</button>
-        <button class="glass-btn" onclick="resetTimer()">Reset</button>
-    </div>
-
-    <div class="bottom-nav">
-        <button class="glass-btn" onclick="changeBackground()">🖼️ Scene</button>
-        <button class="glass-btn" onclick="togglePanel('todo-panel')">📝 Tasks</button>
-        <button class="glass-btn" onclick="togglePanel('settings-panel')">⚙️ Time</button>
-    </div>
-
-    <div class="music-island">
-        <div id="track-label" style="font-size: 0.7rem; margin-bottom: 8px; font-weight: bold;">ALPHA WAVES 1</div>
-        <div style="display: flex; gap: 8px; justify-content: center;">
-            <button style="background:none; border:1px solid rgba(255,255,255,0.2); color:white;" onclick="prevTrack()">⏮</button>
-            <button style="background:none; border:1px solid rgba(255,255,255,0.2); color:white;" id="play-pause-btn" onclick="toggleMusic()">▶</button>
-            <button style="background:none; border:1px solid rgba(255,255,255,0.2); color:white;" onclick="nextTrack()">⏭</button>
+        <div>
+            <div class="stat-label">FOCUS</div>
+            <div class="stat-value" id="focus-total">0m 0s</div>
+        </div>
+        <div>
+            <div class="stat-label">BREAK</div>
+            <div class="stat-value" id="break-total">0m 0s</div>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <div class="timer-display" id="timer-display">25:00</div>
+
+    <div class="controls">
+        <button class="btn" onclick="startTimer()">Start</button>
+        <button class="btn" onclick="pauseTimer()">Pause</button>
+        <button class="btn" onclick="runBreak()">Break</button>
+        <button class="btn" onclick="resetTimer()">Reset</button>
+    </div>
+
+    <div class="toggle-settings" onclick="toggleSettings()">⚙️ SETTINGS</div>
+
+    <div class="side-panel" id="settings-panel">
+        <h3>Settings</h3>
+        <label>Focus Minutes</label>
+        <input type="number" id="focus-input" value="25">
+        <label>Break Minutes</label>
+        <input type="number" id="break-input" value="5">
+        <button class="btn" style="width:100%" onclick="applySettings()">Apply & Save</button>
+        <button class="btn" style="width:100%; margin-top: 10px; color: #ff6b6b;" onclick="resetStats()">Reset All Progress</button>
+    </div>
+
+    <script>
+        // --- DATA STATE ---
+        let focusMins = 25, breakMins = 5;
+        let focusSecs = 0, breakSecs = 0;
+        let timeLeft = focusMins * 60;
+        let timerVar = null;
+        let isBreak = false;
+        let startTime;
+
+        // --- 1. MEMORY LOGIC (LocalStorage) ---
+        function saveProgress() {
+            const data = {
+                focusSecs, breakSecs, focusMins, breakMins
+            };
+            localStorage.setItem('pomoSaveData', JSON.stringify(data));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('pomoSaveData');
+            if (saved) {
+                const data = JSON.parse(saved);
+                focusSecs = data.focusSecs || 0;
+                breakSecs = data.breakSecs || 0;
+                focusMins = data.focusMins || 25;
+                breakMins = data.breakMins || 5;
+                
+                // Update UI from memory
+                document.getElementById('focus-input').value = focusMins;
+                document.getElementById('break-input').value = breakMins;
+                timeLeft = focusMins * 60;
+                updateStatsUI();
+                updateDisplay();
+            }
+        }
+
+        // --- 2. TIMER LOGIC ---
+        function updateDisplay() {
+            const m = Math.floor(timeLeft / 60);
+            const s = timeLeft % 60;
+            const display = `${m}:${s < 10 ? '0' : ''}${s}`;
+            document.getElementById('timer-display').innerText = display;
+            document.title = `${display} | Cozy Pomo`;
+        }
+
+        function updateStatsUI() {
+            document.getElementById('focus-total').innerText = `${Math.floor(focusSecs/60)}m ${focusSecs%60}s`;
+            document.getElementById('break-total').innerText = `${Math.floor(breakSecs/60)}m ${breakSecs%60}s`;
+        }
+
+        function startTimer() {
+            if (timerVar) return;
+            startTime = Date.now();
+            let initialTime = timeLeft;
+
+            timerVar = setInterval(() => {
+                const secondsPassed = Math.floor((Date.now() - startTime) / 1000);
+                timeLeft = initialTime - secondsPassed;
+
+                if (!isBreak) focusSecs++; else breakSecs++;
+
+                if (timeLeft <= 0) {
+                    timeLeft = 0;
+                    pauseTimer();
+                    alert("Session Complete!");
+                }
+                
+                updateDisplay();
+                updateStatsUI();
+                saveProgress(); // Auto-save every second
+            }, 1000);
+        }
+
+        function pauseTimer() { clearInterval(timerVar); timerVar = null; }
+
+        function resetTimer() {
+            pauseTimer();
+            isBreak = false;
+            timeLeft = focusMins * 60;
+            updateDisplay();
+        }
+
+        function runBreak() {
+            pauseTimer();
+            isBreak = true;
+            timeLeft = breakMins * 60;
+            updateDisplay();
+            startTimer();
+        }
+
+        // --- 3. SETTINGS LOGIC ---
+        function toggleSettings() {
+            document.getElementById('settings-panel').classList.toggle('active');
+        }
+
+        function applySettings() {
+            focusMins = parseInt(document.getElementById('focus-input').value);
+            breakMins = parseInt(document.getElementById('break-input').value);
+            saveProgress();
+            resetTimer();
+            toggleSettings();
+        }
+
+        function resetStats() {
+            if(confirm("Clear all your study records?")) {
+                focusSecs = 0; breakSecs = 0;
+                saveProgress();
+                updateStatsUI();
+            }
+        }
+
+        // Initialize on load
+        loadProgress();
+    </script>
 </body>
 </html>
